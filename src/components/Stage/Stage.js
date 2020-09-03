@@ -137,13 +137,16 @@ const Stage = ({
   };
 
   const addNodeOnDrop = e => {
-    const node = JSON.parse(e.dataTransfer.getData(DATA_TRANSFER_FORMAT));
-    if (node && node.type) {
-      addNode({
-        node,
-        internalType: node.type,
-        coordinates: { x: e.clientX, y: e.clientY }
-      });
+    const data = e.dataTransfer.getData(DATA_TRANSFER_FORMAT);
+    if (data) {
+      const node = JSON.parse(data);
+      if (node && node.type) {
+        addNode({
+          node,
+          internalType: node.type,
+          coordinates: { x: e.clientX, y: e.clientY }
+        });
+      }
     }
   };
 
