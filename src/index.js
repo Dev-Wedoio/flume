@@ -54,7 +54,7 @@ export let NodeEditor = (
   const editorId = useId();
   const cache = React.useRef(new Cache());
   const stage = React.useRef();
-  const [sideEffectToasts, setSideEffectToasts] = React.useState()
+  const [sideEffectToasts, setSideEffectToasts] = React.useState();
   const [toasts, dispatchToasts] = React.useReducer(toastsReducer, []);
   const [nodes, dispatchNodes] = React.useReducer(
     connectNodesReducer(
@@ -128,11 +128,11 @@ export let NodeEditor = (
   }, [comments, previousComments, onCommentsChange]);
 
   React.useEffect(() => {
-    if(sideEffectToasts){
-      dispatchToasts(sideEffectToasts)
-      setSideEffectToasts(null)
+    if (sideEffectToasts) {
+      dispatchToasts(sideEffectToasts);
+      setSideEffectToasts(null);
     }
-  }, [sideEffectToasts])
+  }, [sideEffectToasts]);
 
   return (
     <PortTypesContext.Provider value={portTypes}>
@@ -232,3 +232,4 @@ export { FlumeConfig, Controls, Colors } from "./typeBuilders";
 export RootEngine from "./RootEngine";
 export const useRootEngine = (nodes, engine, context) =>
   Object.keys(nodes).length ? engine.resolveRootNode(nodes, { context }) : {};
+export { DropableNode } from "./components/DropableNode/DropableNode";

@@ -6,7 +6,7 @@ import { NodeTypesContext, NodeDispatchContext } from "../../context";
 import Draggable from "../Draggable/Draggable";
 import orderBy from "lodash/orderBy";
 import clamp from "lodash/clamp";
-import { STAGE_ID } from '../../constants'
+import { STAGE_ID, DATA_TRANSFER_FORMAT } from "../../constants";
 
 const Stage = ({
   scale,
@@ -108,13 +108,13 @@ const Stage = ({
 
   const byScale = value => (1 / scale) * value;
 
-  const addNode = ({ node, internalType }) => {
+  const addNode = ({ node, internalType, coordinates }) => {
     const wrapperRect = wrapper.current.getBoundingClientRect();
     const x =
-      byScale(menuCoordinates.x - wrapperRect.x - wrapperRect.width / 2) +
+      byScale(coordinates.x - wrapperRect.x - wrapperRect.width / 2) +
       byScale(translate.x);
     const y =
-      byScale(menuCoordinates.y - wrapperRect.y - wrapperRect.height / 2) +
+      byScale(coordinates.y - wrapperRect.y - wrapperRect.height / 2) +
       byScale(translate.y);
     if (internalType === "comment") {
       dispatchComments({
@@ -128,6 +128,21 @@ const Stage = ({
         x,
         y,
         nodeType: node.type
+      });
+    }
+  };
+
+  const addNodeFromMenu = ({ node, internalType }) => {
+    addNode({ node, internalType, menuCoordinates });
+  };
+
+  const addNodeOnDrop = e => {
+    const node = JSON.parse(e.dataTransfer.getData(DATA_TRANSFER_FORMAT));
+    if (node && node.type) {
+      addNode({
+        node,
+        internalType: node.type,
+        coordinates: { x: e.clientX, y: e.clientY }
       });
     }
   };
@@ -155,7 +170,7 @@ const Stage = ({
   };
 
   React.useEffect(() => {
-    if(!disableZoom){
+    if (!disableZoom) {
       let stageWrapper = wrapper.current;
       stageWrapper.addEventListener("wheel", handleWheel);
       return () => {
@@ -164,27 +179,29 @@ const Stage = ({
     }
   }, [handleWheel, disableZoom]);
 
-  const menuOptions = React.useMemo(
-    () => {
-      const options = orderBy(
-        Object.values(nodeTypes)
-          .filter(node => node.addable !== false)
-          .map(node => ({
-            value: node.type,
-            label: node.label,
-            description: node.description,
-            sortIndex: node.sortIndex,
-            node
-          })),
-        ["sortIndex", "label"]
-      )
-      if(!disableComments){
-        options.push({ value: "comment", label: "Comment", description: "A comment for documenting nodes", internalType: "comment" })
-      }
-      return options
-    },
-    [nodeTypes, disableComments]
-  );
+  const menuOptions = React.useMemo(() => {
+    const options = orderBy(
+      Object.values(nodeTypes)
+        .filter(node => node.addable !== false)
+        .map(node => ({
+          value: node.type,
+          label: node.label,
+          description: node.description,
+          sortIndex: node.sortIndex,
+          node
+        })),
+      ["sortIndex", "label"]
+    );
+    if (!disableComments) {
+      options.push({
+        value: "comment",
+        label: "Comment",
+        description: "A comment for documenting nodes",
+        internalType: "comment"
+      });
+    }
+    return options;
+  }, [nodeTypes, disableComments]);
 
   return (
     <Draggable
@@ -197,6 +214,7 @@ const Stage = ({
       onDragStart={handleDragStart}
       onDrag={handleMouseDrag}
       onDragEnd={handleDragEnd}
+      onDrop={addNodeOnDrop}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
       stageState={{ scale, translate }}
@@ -210,7 +228,7 @@ const Stage = ({
             y={menuCoordinates.y}
             options={menuOptions}
             onRequestClose={closeContextMenu}
-            onOptionSelected={addNode}
+            onOptionSelected={addNodeFromMenu}
             label="Add Node"
           />
         </Portal>
