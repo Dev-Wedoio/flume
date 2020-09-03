@@ -133,7 +133,7 @@ const Stage = ({
   };
 
   const addNodeFromMenu = ({ node, internalType }) => {
-    addNode({ node, internalType, menuCoordinates });
+    addNode({ node, internalType, coordinates: menuCoordinates });
   };
 
   const addNodeOnDrop = e => {
