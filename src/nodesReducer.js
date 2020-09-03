@@ -232,7 +232,8 @@ const nodesReducer = (
         input.portName
       ];
       if (inputIsNotConnected) {
-        const allowCircular = circularBehavior === "warn" || circularBehavior === "allow"
+        const allowCircular =
+          circularBehavior === "warn" || circularBehavior === "allow";
         const newNodes = addConnection(nodes, input, output, portTypes);
         const isCircular = checkForCircularNodes(newNodes, output.nodeId);
         if (isCircular && !allowCircular) {
@@ -245,7 +246,7 @@ const nodesReducer = (
           });
           return nodes;
         } else {
-          if(isCircular && circularBehavior === "warn"){
+          if (isCircular && circularBehavior === "warn") {
             dispatchToasts({
               type: "ADD_TOAST",
               title: "Circular Connection Detected",
@@ -309,7 +310,7 @@ const nodesReducer = (
         if (newNodes[key].defaultNode) {
           const newNodeId = nanoid(10);
           const { id, defaultNode, ...node } = newNodes[key];
-          newNodes[newNodeId] = {...node, id: newNodeId };
+          newNodes[newNodeId] = { ...node, id: newNodeId };
           delete newNodes[key];
         }
       }

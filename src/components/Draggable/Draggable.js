@@ -8,6 +8,7 @@ export default ({
   onDragStart,
   onDrag,
   onDragEnd,
+  onDrop,
   onMouseDown,
   onTouchStart,
   disabled,
@@ -137,6 +138,8 @@ export default ({
         e.preventDefault();
         e.stopPropagation();
       }}
+      onDrop={onDrop}
+      onDragOver={e => e.preventDefault()}
       ref={ref => {
         wrapper.current = ref;
         if (innerRef) {
